@@ -4,6 +4,32 @@ import pandas as pd
 from sensor_selection import run_prediction_for_unit
 from config import Config
 
+
+def run_prediction_for_unit_with_uncertainty(unit_df, sensors, params):
+    """
+    RUL prediction with uncertainty quantification.
+    Returns mean RUL and std at each time step.
+    """
+    from particle_filter import ParticleFilter
+    
+    pf = ParticleFilter(params, sensors)
+    measurements = unit_df[sensors].values
+    
+    ruls_mean = []
+    ruls_std = []
+    
+    for t, meas in enumerate(measurements):
+        pf.predict()
+        pf.update(meas)
+        pf.fuzzy_resampling()
+        
+        # Get distribution
+        rul_mean, rul_std = pf.estimate_rul(return_distribution=True)
+        ruls_mean.append(rul_mean)
+        ruls_std.append(rul_std)
+    
+    return np.array(ruls_mean), np.array(ruls_std)
+
 def run_percentile_experiment(test_df, test_ruls, msdfm, sensor_sets):
     """
     Runs RUL prediction at 10%...90% of lifetime.

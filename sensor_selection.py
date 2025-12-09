@@ -14,14 +14,19 @@ def calculate_ware(y_true, y_pred, time_indices):
 def run_prediction_for_unit(unit_df, sensors, params):
     pf = ParticleFilter(params, sensors)
     measurements = unit_df[sensors].values
-    ruls = []
+    if len(measurements) == 0:
+        return np.array([])
     
-    for t, meas in enumerate(measurements):
+    pf = ParticleFilter(params, sensors, initial_data=measurements[0])
+    ruls = [pf.estimate_rul()]
+    
+    for t in range(1, len(measurements)):
+        meas = measurements[t]
         pf.predict()
         pf.update(meas)
         pf.fuzzy_resampling()
         ruls.append(pf.estimate_rul())
-        
+    
     return np.array(ruls)
 
 def psgs_algorithm(train_df, lifetimes, params):

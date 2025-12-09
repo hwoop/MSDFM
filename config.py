@@ -1,8 +1,8 @@
 # config.py
 class Config:
     # Hyperparameters
-    # NUM_PARTICLES = 1000  # N_s: Number of particles (User requested parameter)
-    NUM_PARTICLES = 10000
+    NUM_PARTICLES = 1000  # N_s: Number of particles (User requested parameter)
+    # NUM_PARTICLES = 10000
     
     # Dataset Config
     DATASET_PATH = 'data/train_FD001.txt'  # Path to training data
