@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 # === Timestamp 기반 디렉토리 생성 ===
-BASE_DIR = 'output'
+BASE_DIR = 'outputs'
 timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S') # Windows 호환을 위해 콜론 대신 하이픈 사용 권장
 OUTPUT_DIR = os.path.join(BASE_DIR, timestamp)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -155,3 +155,31 @@ def plot_are_comparison(results, percentiles, title_suffix="", filename=None):
         save_name = f"Fig_ARE_Comparison_{clean_suffix}.png"
         
     _save_and_close(fig, save_name)
+    
+def plot_fig8(train_df):
+    """Reproduces Fig 8: Degradation signals of 21 sensors"""
+    sensors = [col for col in train_df.columns if col.startswith('s_')]
+    n_sensors = len(sensors)
+    
+    # 논문은 3행 7열 레이아웃 등을 사용했으나, 21개를 보기 좋게 4x6이나 3x7로 배치
+    rows = 3
+    cols = 7
+    fig, axes = plt.subplots(rows, cols, figsize=(20, 10))
+    axes = axes.flatten()
+    
+    units = train_df['unit_nr'].unique()
+    
+    for i, sensor in enumerate(sensors):
+        ax = axes[i]
+        # 모든 유닛에 대해 플롯 (논문처럼 파란색 실선)
+        for u in units:
+            u_df = train_df[train_df['unit_nr'] == u]
+            ax.plot(u_df['time_cycles'], u_df[sensor], color='blue', linewidth=0.5, alpha=0.3)
+            
+        ax.set_title(f'{i+1}. {sensor}')
+        # X축/Y축 라벨은 공간상 생략하거나 간소화
+        if i >= (rows-1)*cols:
+            ax.set_xlabel('Time (cycles)')
+            
+    plt.tight_layout()
+    _save_and_close(fig, "Fig8_NASA_Raw_Sensor_Signals.png")    

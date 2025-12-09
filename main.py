@@ -7,7 +7,7 @@ from models import MSDFM_Parameters
 from sensor_selection import psgs_algorithm, calculate_ware, run_prediction_for_unit
 from simulation_data import SimulationGenerator
 from experiments import run_percentile_experiment
-from plot_figures import plot_fig4, plot_fig5, plot_psgs_ware, plot_are_comparison
+from plot_figures import plot_fig4, plot_fig5, plot_psgs_ware, plot_are_comparison, plot_fig8
 
 def run_pipeline(name, train_df, test_df, test_ruls, lifetimes, fig_psgs_name=None, fig_are_name=None):
     print(f"\n=== Running Pipeline for {name} ===")
@@ -102,6 +102,9 @@ def main():
     lifetimes = get_lifetimes(nasa_train)
     train_lifetimes = lifetimes[:split_idx]
     val_lifetimes = lifetimes[split_idx:]
+    
+    print("Generating Figure 8...")
+    plot_fig8(nasa_train)  # 전체 Training set (100 units) 시각화
     
     # Run Pipeline for NASA (Fig 9 & 10)
     run_pipeline("NASA FD001", nasa_train_split, nasa_val_split, val_lifetimes, train_lifetimes,
