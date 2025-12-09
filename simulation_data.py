@@ -225,16 +225,29 @@ class SimulationGenerator:
         # Concatenate all units
         full_df = pd.concat(data_list, ignore_index=True)
         
+        print(f"\n[Normalization] Normalizing sensor signals...")
+        sensors = [f's_{i+1}' for i in range(self.n_sensors)]
+        
+        for sensor in sensors:
+            original_mean = full_df[sensor].mean()
+            original_std = full_df[sensor].std()
+            
+            if original_std > 1e-6:
+                # Z-score normalization
+                full_df[sensor] = (full_df[sensor] - original_mean) / original_std
+            else:
+                print(f"  Warning: {sensor} has zero variance, skipping normalization")
+        
+        # Verify normalization
+        sensor_means = full_df[sensors].mean().values
+        sensor_stds = full_df[sensors].std().values
+        print(f"  Post-normalization mean range: [{sensor_means.min():.3f}, {sensor_means.max():.3f}]")
+        print(f"  Post-normalization std range: [{sensor_stds.min():.3f}, {sensor_stds.max():.3f}]")
+        
         print(f"Dataset generation complete!")
         print(f"  Total units: {self.n_units}")
         print(f"  Average lifetime: {np.mean(lifetimes):.2f} cycles")
         print(f"  Lifetime range: [{np.min(lifetimes):.2f}, {np.max(lifetimes):.2f}]")
-        
-        
-        for i in range(self.n_sensors):
-            sensor_col = f's_{i+1}'
-            full_df[sensor_col] = (full_df[sensor_col] - full_df[sensor_col].mean()) / \
-                                (full_df[sensor_col].std() + 1e-6)
         
         return full_df, np.array(lifetimes)
     

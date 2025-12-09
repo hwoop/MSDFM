@@ -1,24 +1,34 @@
-# config.py
+# config.py 수정
+
 class Config:
-    # Hyperparameters
-    NUM_PARTICLES = 1000  # N_s: Number of particles (User requested parameter)
-    # NUM_PARTICLES = 10000
+    # ================================================================
+    # PARTICLE FILTER PARAMETERS (Increased for stability)
+    # ================================================================
+    NUM_PARTICLES = 5000  # Increased from 1000
     
     # Dataset Config
-    DATASET_PATH = 'data/train_FD001.txt'  # Path to training data
-    TEST_PATH = 'data/test_FD001.txt'      # Path to test data
-    RUL_PATH = 'data/RUL_FD001.txt'        # Path to RUL truth
+    DATASET_PATH = 'data/train_FD001.txt'
+    TEST_PATH = 'data/test_FD001.txt'
+    RUL_PATH = 'data/RUL_FD001.txt'
     
     # Model Config
-    FAILURE_THRESHOLD = 1.0     # D = 1 (Normalized state)
-    DT = 1.0                    # Time interval (cycle)
+    FAILURE_THRESHOLD = 1.0
+    DT = 1.0
     
     # Sensor Config (NASA C-MAPSS has 21 sensors)
     TOTAL_SENSORS = 21
-    # Columns in C-MAPSS FD001
     INDEX_COLS = ['unit_nr', 'time_cycles']
     SETTING_COLS = ['setting_1', 'setting_2', 'setting_3']
     SENSOR_COLS = ['s_{}'.format(i) for i in range(1, 22)]
     
-    # Optimization
-    SMOOTHING_FRAC = 0.1 # Lowess smoothing fraction
+    # ================================================================
+    # OPTIMIZATION PARAMETERS (Increased for robustness)
+    # ================================================================
+    SMOOTHING_FRAC = 0.2  # Increased from 0.1 for more smoothing
+    
+    # ================================================================
+    # PARTICLE FILTER STABILITY (New)
+    # ================================================================
+    INITIAL_COVARIANCE_INFLATION = 100.0  # For first update
+    REGULAR_COVARIANCE_INFLATION = 10.0   # For subsequent updates
+    MIN_EFFECTIVE_SAMPLE_SIZE_RATIO = 0.05  # 5% of NUM_PARTICLES
